@@ -18,7 +18,13 @@ public:
 	struct pollfd get_poll() const;
 
 private:
-	int m_fd;
+	union {
+		int m_fd;
+		struct {
+			int readfd;
+			int writefd;
+		} m_darwin;
+	};
 
 	linux_event(linux_event const &);
 	linux_event & operator=(linux_event const &);

@@ -17,6 +17,7 @@ public:
 
 	const char * what() const throw()
 	{
+		(void)m_cl;
 		return "cancelled";
 	}
 

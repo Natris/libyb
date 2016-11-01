@@ -42,7 +42,7 @@ public:
 		}
 		else
 		{
-			return task<short>::from_exception(std::copy_exception(task_cancelled()));
+			return task<short>::from_exception(std::make_exception_ptr(task_cancelled()));
 		}
 	}
 

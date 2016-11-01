@@ -4,6 +4,10 @@
 #include "../task.hpp"
 #include "../../buffer.hpp"
 
+#ifdef __APPLE__
+static  const int MSG_NOSIGNAL = 0;
+#endif // __APPLE__
+
 namespace yb {
 namespace detail {
 

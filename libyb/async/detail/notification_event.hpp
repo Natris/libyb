@@ -22,6 +22,10 @@ private:
 	{
 		void * m_win32_handle;
 		int m_linux_eventfd;
+		struct {
+			int readfd;
+			int writefd;
+		} m_darwin;
 	};
 
 	notification_event(notification_event const &);

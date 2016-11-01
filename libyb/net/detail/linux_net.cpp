@@ -1,4 +1,5 @@
 #include "../net.hpp"
+#include "../pipe.hpp"
 #include "../../async/detail/unix_file.hpp"
 #include "../../async/detail/linux_fdpoll_task.hpp"
 #include "../../utils/detail/scoped_unix_fd.hpp"
@@ -7,6 +8,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <errno.h>
+#include <sys/un.h>
+#include <fcntl.h>
 using namespace yb;
 
 struct tcp_socket::impl
@@ -39,6 +43,7 @@ tcp_socket & tcp_socket::operator=(tcp_socket && o)
 {
 	tcp_socket tmp(std::move(o));
 	std::swap(m_pimpl, tmp.m_pimpl);
+	return *this;
 }
 
 void tcp_socket::clear()

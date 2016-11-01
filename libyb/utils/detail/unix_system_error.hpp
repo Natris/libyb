@@ -11,7 +11,7 @@ class unix_system_error
 {
 public:
 	explicit unix_system_error(int error_number)
-		: std::runtime_error(std::string()), m_errno(error_number)
+		: std::runtime_error(""), m_errno(error_number)
 	{
 	}
 

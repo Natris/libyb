@@ -7,7 +7,6 @@
 #include <memory>
 #include <list>
 #include <atomic>
-#include <sys/eventfd.h>
 #include <unistd.h>
 #include <poll.h>
 

@@ -37,7 +37,7 @@ public:
 	virtual void cancel_and_wait() throw() = 0;
 
 protected:
-	~prepared_task();
+	virtual ~prepared_task();
 
 	cancel_level requested_cancel_level() const throw();
 	void mark_finished() throw();

@@ -3,13 +3,13 @@
 #include "../../utils/detail/linux_event.hpp"
 #include "../../utils/detail/unix_system_error.hpp"
 #include "linux_wait_context.hpp"
-#include <sys/eventfd.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <stdexcept>
 #include <list>
 #include <cassert>
+#include <errno.h>
 using namespace yb;
 
 struct sync_runner::impl

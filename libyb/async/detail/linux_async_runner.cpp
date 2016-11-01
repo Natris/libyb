@@ -2,6 +2,8 @@
 #include "../sync_runner.hpp"
 #include "../promise.hpp"
 #include <pthread.h>
+#include <stdexcept>
+
 using namespace yb;
 
 struct async_runner::impl
