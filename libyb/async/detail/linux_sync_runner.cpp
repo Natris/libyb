@@ -2,7 +2,11 @@
 #include "../../utils/detail/pthread_mutex.hpp"
 #include "../../utils/detail/linux_event.hpp"
 #include "../../utils/detail/unix_system_error.hpp"
+#ifdef __APPLE__
+#include "darwin_wait_context.hpp"
+#else // __APPLE__
 #include "linux_wait_context.hpp"
+#endif // __APPLE__
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -76,7 +80,8 @@ void sync_runner::run_until(detail::prepared_task * focused_pt)
 
 		if (prep_ctx_impl->m_finished_tasks)
 		{
-			fin_ctx.selected_poll_item = 0;
+			fin_ctx.selected_poll_item = (size_t)-1;
+			fin_ctx.selected_timer_item = (size_t)-1;
 			for (std::list<impl::task_entry>::iterator it = m_pimpl->m_tasks.begin(), eit = m_pimpl->m_tasks.end(); it != eit;)
 			{
 				impl::task_entry & pe = *it;
@@ -107,10 +112,29 @@ void sync_runner::run_until(detail::prepared_task * focused_pt)
 			m_pimpl->m_update_event.reset();
 			m_pimpl->m_mutex.unlock();
 
+			int timeout = -1;
+			auto tit = min_element(prep_ctx_impl->m_timeouts.begin(), prep_ctx_impl->m_timeouts.end());
+
 			int r;
 			for (;;)
 			{
-				r = poll(prep_ctx_impl->m_pollfds.data(), prep_ctx_impl->m_pollfds.size(), -1);
+				if (tit != prep_ctx_impl->m_timeouts.end()) 
+				{
+					struct timeval to;
+					gettimeofday(&to, nullptr);
+					uint64_t tnow = (uint64_t)to.tv_sec * 1000 + to.tv_usec / 1000;
+					if (tnow > *tit)
+					{
+						timeout = 0;
+					}
+					else
+					{
+						timeout = *tit - tnow;
+						if (timeout > INT_MAX)
+							timeout = INT_MAX;
+					}
+				}
+				r = poll(prep_ctx_impl->m_pollfds.data(), prep_ctx_impl->m_pollfds.size(), timeout);
 				if (r != -1)
 					break;
 				int e = errno;
@@ -120,24 +144,49 @@ void sync_runner::run_until(detail::prepared_task * focused_pt)
 			}
 			m_pimpl->m_mutex.lock();
 
-			assert(r != 0);
-			for (size_t i = 0; r; ++i)
+			if (r != 0)
 			{
-				struct pollfd & p = prep_ctx_impl->m_pollfds[i];
-				if (!p.revents)
-					continue;
-				--r;
+				for (size_t i = 0; r; ++i)
+				{
+					struct pollfd & p = prep_ctx_impl->m_pollfds[i];
+					if (!p.revents)
+						continue;
+					--r;
 
-				if (i == 0)
-					continue;
+					if (i == 0)
+						continue;
 
+					fin_ctx.finished_tasks = 0;
+					fin_ctx.selected_timer_item = (size_t)-1;
+					for (std::list<impl::task_entry>::iterator it = m_pimpl->m_tasks.begin(), eit = m_pimpl->m_tasks.end(); it != eit; ++it)
+					{
+						impl::task_entry & pe = *it;
+						if (pe.memento.poll_item_first <= i && pe.memento.poll_item_last > i)
+						{
+							fin_ctx.selected_poll_item = i;
+							if (pe.pt->finish_wait(fin_ctx))
+							{
+								if (pe.pt == focused_pt)
+									done = true;
+								pe.pt->detach_event_sink();
+								m_pimpl->m_tasks.erase(it);
+							}
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				int i = tit - prep_ctx_impl->m_timeouts.begin();
 				fin_ctx.finished_tasks = 0;
+				fin_ctx.selected_poll_item = (size_t)-1;
 				for (std::list<impl::task_entry>::iterator it = m_pimpl->m_tasks.begin(), eit = m_pimpl->m_tasks.end(); it != eit; ++it)
 				{
 					impl::task_entry & pe = *it;
-					if (pe.memento.poll_item_first <= i && pe.memento.poll_item_last > i)
+					if (pe.memento.timer_item_first <= i && pe.memento.timer_item_last > i)
 					{
-						fin_ctx.selected_poll_item = i;
+						fin_ctx.selected_timer_item = i;
 						if (pe.pt->finish_wait(fin_ctx))
 						{
 							if (pe.pt == focused_pt)

@@ -36,15 +36,24 @@ notification_event & notification_event::operator=(notification_event && o)
 
 void notification_event::set()
 {
-	uint64_t val = 1;
-	write(m_darwin.writefd, &val, sizeof val);
+	unsigned char val = 1;
+	::write(m_darwin.writefd, &val, sizeof val);
 }
 
 void notification_event::reset()
 {
-	uint64_t val;
-	while (read(m_darwin.readfd, &val, sizeof val) > 0) 
-		;
+	for (;;) {
+		unsigned char val;
+		struct pollfd pf;
+		pf.events = POLLIN;
+		pf.fd = m_darwin.readfd;
+		int res = poll(&pf, 1, 0);
+		if (res > 0) {
+			::read(m_darwin.readfd, &val, sizeof val);
+		} else if (res == 0) {
+			return;
+		}
+	}
 }
 
 yb::task<void> notification_event::wait()

@@ -25,14 +25,24 @@ linux_event::~linux_event()
 
 void linux_event::set()
 {
-	uint64_t val = 1;
+	unsigned char val = 1;
 	write(m_darwin.writefd, &val, sizeof val);
 }
 
 void linux_event::reset()
 {
-	uint64_t val;
-	::read(m_darwin.readfd, &val, sizeof val);
+	for (;;) {
+		unsigned char val;
+		struct pollfd pf;
+		pf.events = POLLIN;
+		pf.fd = m_darwin.readfd;
+		int res = poll(&pf, 1, 0);
+		if (res > 0) {
+			::read(m_darwin.readfd, &val, sizeof val);
+		} else if (res == 0) {
+			return;
+		}
+	}
 }
 
 void linux_event::wait() const

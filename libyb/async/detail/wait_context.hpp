@@ -12,6 +12,7 @@ struct task_wait_preparation_context_impl;
 struct task_wait_checkpoint
 {
 	size_t poll_item_count;
+	size_t timer_item_count;
 	size_t finished_task_count;
 };
 
@@ -20,12 +21,19 @@ struct task_wait_memento
 	size_t poll_item_first;
 	size_t poll_item_last;
 
+	size_t timer_item_first;
+	size_t timer_item_last;
+
 	size_t finished_task_count;
 
 	void clear()
 	{
 		poll_item_first = 0;
 		poll_item_last = 0;
+
+		timer_item_first = 0;
+		timer_item_last = 0;
+
 		finished_task_count = 0;
 	}
 };
@@ -63,6 +71,8 @@ public:
 		res.finished_task_count = chkp.finished_task_count - m_checkpoint.finished_task_count;
 		res.poll_item_first = m_checkpoint.poll_item_count;
 		res.poll_item_last = chkp.poll_item_count;
+		res.timer_item_first = m_checkpoint.timer_item_count;
+		res.timer_item_last = chkp.timer_item_count;
 		return res;
 	}
 
@@ -77,11 +87,16 @@ public:
 	task_wait_preparation_context * prep_ctx;
 	size_t finished_tasks;
 	size_t selected_poll_item;
+	size_t selected_timer_item;
+
+	bool is_poll_item() const { return selected_poll_item != (size_t)-1; }
+	bool is_timer_item() const { return selected_timer_item != (size_t)-1; }
 
 	bool contains(task_wait_memento const & m) const
 	{
 		return (finished_tasks && m.finished_task_count != 0)
-			|| (!finished_tasks && m.poll_item_first <= selected_poll_item && selected_poll_item < m.poll_item_last);
+			|| (is_poll_item() && m.poll_item_first <= selected_poll_item && selected_poll_item < m.poll_item_last)
+			|| (is_timer_item() && m.timer_item_first <= selected_timer_item && selected_timer_item < m.timer_item_last);
 	}
 };
 
