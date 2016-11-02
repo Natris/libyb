@@ -26,14 +26,14 @@ struct sync_runner::impl
 
 	detail::pthread_mutex m_mutex;
 	detail::linux_event m_update_event;
-	pid_t m_associated_thread;
+	pthread_t m_associated_thread;
 	std::list<task_entry> m_tasks;
 };
 
 sync_runner::sync_runner(bool associate_thread_now)
 	: m_pimpl(new impl())
 {
-	m_pimpl->m_associated_thread = associate_thread_now? syscall(SYS_gettid): 0;
+	m_pimpl->m_associated_thread = associate_thread_now? pthread_self(): (pthread_t)-1;
 }
 
 sync_runner::~sync_runner()
@@ -47,13 +47,13 @@ sync_runner::~sync_runner()
 
 void sync_runner::associate_current_thread()
 {
-	assert(m_pimpl->m_associated_thread == 0);
-	m_pimpl->m_associated_thread = syscall(SYS_gettid);
+	assert(m_pimpl->m_associated_thread == (pthread_t)-1);
+	m_pimpl->m_associated_thread = pthread_self();
 }
 
 void sync_runner::run_until(detail::prepared_task * focused_pt)
 {
-	assert(m_pimpl->m_associated_thread == syscall(SYS_gettid));
+	assert(m_pimpl->m_associated_thread == pthread_self());
 
 	task_wait_preparation_context prep_ctx;
 	task_wait_preparation_context_impl * prep_ctx_impl = prep_ctx.get();
@@ -221,9 +221,9 @@ void sync_runner::cancel(detail::prepared_task *) throw()
 
 void sync_runner::cancel_and_wait(detail::prepared_task * pt) throw()
 {
-	assert(m_pimpl->m_associated_thread != 0);
+	assert(m_pimpl->m_associated_thread != (pthread_t)-1);
 
-	if (m_pimpl->m_associated_thread == syscall(SYS_gettid))
+	if (m_pimpl->m_associated_thread == pthread_self())
 	{
 		for (std::list<impl::task_entry>::iterator it = m_pimpl->m_tasks.begin(), eit = m_pimpl->m_tasks.end(); it != eit; ++it)
 		{
@@ -239,7 +239,7 @@ void sync_runner::cancel_and_wait(detail::prepared_task * pt) throw()
 	}
 	else
 	{
-		pt->request_cancel(cl_kill);
+		pt->request_cancel(cl_kill, true);
 		pt->shadow_wait();
 	}
 }

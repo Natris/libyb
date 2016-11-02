@@ -114,7 +114,7 @@ shadow_task<R>::~shadow_task()
 template <typename R>
 void shadow_task<R>::cancel(cancel_level cl) throw()
 {
-	m_pt->request_cancel(cl);
+	m_pt->request_cancel(cl, false);
 }
 
 template <typename R>

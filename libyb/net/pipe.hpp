@@ -5,7 +5,7 @@
 
 namespace yb {
 
-class pipe
+class pipe final
 	: public stream
 {
 public:

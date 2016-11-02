@@ -40,7 +40,7 @@ void prepared_task::release() throw()
 		delete this;
 }
 
-void prepared_task::request_cancel(cancel_level cl) throw()
+void prepared_task::request_cancel(cancel_level cl, bool nolock) throw()
 {
 	cancel_level guess_cl = cl_none;
 	while (guess_cl < cl)
@@ -49,9 +49,14 @@ void prepared_task::request_cancel(cancel_level cl) throw()
 		{
 			// We managed to increase the cancel level, signal the runner
 			// to apply it.
-			detail::scoped_pthread_lock l(m_pimpl->m_mutex);
-			if (m_pimpl->m_runner)
-				m_pimpl->m_runner->cancel(this);
+			if (nolock) {
+				if (m_pimpl->m_runner)
+					m_pimpl->m_runner->cancel(this);
+			} else {
+				detail::scoped_pthread_lock l(m_pimpl->m_mutex);
+				if (m_pimpl->m_runner)
+					m_pimpl->m_runner->cancel(this);
+			}
 			return;
 		}
 	}
@@ -59,7 +64,7 @@ void prepared_task::request_cancel(cancel_level cl) throw()
 
 void prepared_task::shadow_prepare_wait(task_wait_preparation_context & prep_ctx, cancel_level cl)
 {
-	this->request_cancel(cl);
+	this->request_cancel(cl, false);
 	prep_ctx.get()->m_pollfds.push_back(m_pimpl->m_done_event.get_poll());
 }
 
