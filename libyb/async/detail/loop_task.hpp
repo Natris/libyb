@@ -33,13 +33,13 @@ class loop_task
 public:
 	loop_task(task<S> && t, F f, loop_state<T> && state);
 
-	task<void> cancel_and_wait() throw();
-	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl);
-	task<void> finish_wait(task_wait_finalization_context & ctx) throw();
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	task<void> cancel_and_wait() throw() override;
+	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override;
+	task<void> finish_wait(task_wait_finalization_context & ctx) throw() override;
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		std::string str = detail::dbg_print(ctx, "loop_task: m_cancel_level=%d", (int)m_cancel_level);
-		str += m_task.dbg_print(ctx);
+		std::string str = detail::dbg_print(ctx + 1, "loop_task: m_cancel_level=%d", (int)m_cancel_level);
+		str += m_task.dbg_print(ctx + 1);
 		return str;
 	}
 
@@ -241,10 +241,10 @@ public:
 
 		return nulltask;
 	}
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		std::string str = detail::dbg_print(ctx, "loop2_task: m_cancel_level=%d", (int)m_cancel_level);
-		str += m_state.dbg_print(ctx);
+		std::string str = detail::dbg_print(ctx + 1, "loop2_task: m_cancel_level=%d", (int)m_cancel_level);
+		str += m_state.dbg_print(ctx + 1);
 		return str;
 	}
 

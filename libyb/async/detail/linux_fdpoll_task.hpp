@@ -71,9 +71,9 @@ public:
 		else
 			return async::raise<short>(task_cancelled());
 	}
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		return detail::dbg_print(ctx, "linux_fdpoll_task: m_fd=%d, m_events=%d", (int)m_fd, (int)m_events);
+		return detail::dbg_print(ctx + 1, "linux_fdpoll_task: m_fd=%d, m_events=%d", (int)m_fd, (int)m_events);
 	}
 
 private:

@@ -15,9 +15,9 @@ public:
 	task<void> cancel_and_wait() throw() override;
 	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override;
 	task<void> finish_wait(task_wait_finalization_context & ctx) throw() override;
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		return detail::dbg_print(ctx, "exit_guard_task: threshold=%d", (int)m_threshold);
+		return detail::dbg_print(ctx + 1, "exit_guard_task: threshold=%d", (int)m_threshold);
 	}
 
 private:

@@ -51,3 +51,8 @@ void async_runner::run_until(detail::prepared_task * pt)
 {
     pt->shadow_wait();
 }
+
+std::string async_runner::dbg_print_unsafe()
+{
+	return m_pimpl->m_runner.dbg_print_unsafe();
+}

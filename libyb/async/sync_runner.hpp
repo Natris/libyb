@@ -19,6 +19,7 @@ public:
 	void run_until(detail::prepared_task * pt) override;
 	void submit(detail::prepared_task * pt) override;
 
+	std::string dbg_print_unsafe() override;
 private:
 	void cancel(detail::prepared_task * pt) throw() override;
 	void cancel_and_wait(detail::prepared_task * pt) throw() override;

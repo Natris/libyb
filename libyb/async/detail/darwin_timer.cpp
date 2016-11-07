@@ -27,6 +27,11 @@ public:
 
 	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override
 	{
+		if (cl >= cl_abort) {
+			m_time = (uint64_t)-1;
+			ctx.set_finished();
+			return;
+		}
 		if (m_time == (uint64_t)-1) {
 			struct timeval timeout;
 			gettimeofday(&timeout, nullptr);
@@ -37,11 +42,14 @@ public:
 
 	task<void> finish_wait(task_wait_finalization_context &) throw() override
 	{
+		if (m_time == (uint64_t)-1) {
+			return task<void>::from_exception(std::make_exception_ptr(task_cancelled()));
+		}
 		return async::value();
 	}
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		return detail::dbg_print(ctx, "darwin_timer_task: milliseconds=%d, m_time=%llu", (int)m_ms, m_time);
+		return detail::dbg_print(ctx + 1, "darwin_timer_task: milliseconds=%d, m_time=%llu", (int)m_ms, m_time);
 	}
 
 private:

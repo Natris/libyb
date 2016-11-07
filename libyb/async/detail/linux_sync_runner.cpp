@@ -202,6 +202,18 @@ void sync_runner::run_until(detail::prepared_task * focused_pt)
 	}
 }
 
+std::string sync_runner::dbg_print_unsafe()
+{
+	std::string str;
+	int i = 0;
+	for (auto item: m_pimpl->m_tasks) {
+		str += detail::dbg_print(0, "runner: task %i", i);
+		str += item.pt->dbg_print(1);
+		++i;
+	}
+	return str;
+}
+
 void sync_runner::submit(detail::prepared_task * pt)
 {
 	impl::task_entry te;
@@ -216,6 +228,7 @@ void sync_runner::submit(detail::prepared_task * pt)
 
 void sync_runner::cancel(detail::prepared_task *) throw()
 {
+	detail::scoped_pthread_lock l(m_pimpl->m_mutex);
 	m_pimpl->m_update_event.set();
 }
 

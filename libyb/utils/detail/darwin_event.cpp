@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 using namespace yb::detail;
 
 linux_event::linux_event()
@@ -26,7 +27,12 @@ linux_event::~linux_event()
 void linux_event::set()
 {
 	unsigned char val = 1;
-	write(m_darwin.writefd, &val, sizeof val);
+	for (;;) {
+		auto res = write(m_darwin.writefd, &val, sizeof val);
+		if (res > 0) {
+			return;
+		}
+	}
 }
 
 void linux_event::reset()
@@ -48,7 +54,8 @@ void linux_event::reset()
 void linux_event::wait() const
 {
 	struct pollfd pf = this->get_poll();
-	::poll(&pf, 1, -1);
+	while (::poll(&pf, 1, -1) <= 0)
+		;
 }
 
 struct pollfd linux_event::get_poll() const

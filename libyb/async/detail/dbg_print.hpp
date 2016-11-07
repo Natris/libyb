@@ -8,23 +8,24 @@
 namespace yb {
 namespace detail {
 
-struct dbg_print_ctx
-{
-	dbg_print_ctx() : level(0) {}
-	dbg_print_ctx(const dbg_print_ctx& old) : level(old.level + 1) {}
-
-	int get_indent() { return level * 4; }
-private:
-	int level;
-};
+typedef int dbg_print_ctx;
 
 template<typename ... Args>
-std::string dbg_print(const dbg_print_ctx & ctx, const char * fmt, Args ... args)
+std::string dbg_print(dbg_print_ctx ctx, const char * fmt, Args ... args)
 {
-	size_t size = snprintf( nullptr, 0, fmt, args ... ) + 1;
+	/*
+	size_t size = snprintf( nullptr, 0, fmt, args ... ) + 1 + ctx * 4 + 1;
 	std::unique_ptr<char[]> buf( new char[ size ] ); 
-	snprintf( buf.get(), size, fmt, args ... );
-	return std::string( buf.get(), buf.get() + size - 1 );
+	buf.get()[0] = '\n';
+	memset(buf.get() + 1, ' ', ctx * 4);
+	snprintf( buf.get() + ctx * 4 + 1, size - (ctx * 4 + 1), fmt, args ... );
+	return std::string( buf.get(), buf.get() + size - 1 );*/
+	for (int i = 0; i < ctx; ++i) {
+		printf("    ");
+	}
+	printf(fmt, args...);
+	printf("\n");
+	return std::string();
 }
 
 } // namespace detail

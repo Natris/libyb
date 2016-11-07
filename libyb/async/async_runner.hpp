@@ -16,6 +16,7 @@ public:
 	void submit(detail::prepared_task * pt) override;
 	void run_until(detail::prepared_task * pt) override;
 
+	std::string dbg_print_unsafe() override;
 private:
 	struct impl;
 	std::unique_ptr<impl> m_pimpl;

@@ -16,10 +16,10 @@ public:
 	task<void> cancel_and_wait() throw() override;
 	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override;
 	task<void> finish_wait(task_wait_finalization_context & ctx) throw() override;
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		std::string str = detail::dbg_print(ctx, "parallel_composition_task");
-		str += m_compositor.dbg_print(ctx);
+		std::string str = detail::dbg_print(ctx + 1, "parallel_composition_task");
+		str += m_compositor.dbg_print(ctx + 1);
 		return str;
 	}
 

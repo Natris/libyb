@@ -146,7 +146,7 @@ task<R>::task(task<R> && o)
 }
 	
 template <typename R>	
-std::string task<R>::dbg_print(const detail::dbg_print_ctx & ctx)
+std::string task<R>::dbg_print(detail::dbg_print_ctx ctx)
 {
 	switch (m_kind)
 	{
@@ -158,7 +158,7 @@ std::string task<R>::dbg_print(const detail::dbg_print_ctx & ctx)
 	case k_future:
 		{
 			std::string str = detail::dbg_print(ctx, "yb::task containing task:");
-			str += as_task()->dbg_print(ctx);
+			str += as_task()->dbg_print(ctx + 1);
 			return str;
 		}
 	case k_empty:

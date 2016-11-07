@@ -19,10 +19,10 @@ public:
 	void prepare_wait(task_wait_preparation_context & prep_ctx) override;
 	bool finish_wait(task_wait_finalization_context & fin_ctx) throw() override;
 	void cancel_and_wait() throw() override;
-	std::string dbg_print(const detail::dbg_print_ctx& ctx)
+	std::string dbg_print(detail::dbg_print_ctx ctx)
 	{
-		std::string str = detail::dbg_print(ctx, "prepared_task_impl: applied_cl=%d", (int)m_applied_cl);
-		str += m_task.dbg_print(ctx);
+		std::string str = detail::dbg_print(ctx + 1, "prepared_task_impl: applied_cl=%d", (int)m_applied_cl);
+		str += m_task.dbg_print(ctx + 1);
 		return str;
 	}
 
@@ -60,9 +60,9 @@ public:
 	task<R> cancel_and_wait() throw() override;
 	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override;
 	task<R> finish_wait(task_wait_finalization_context & ctx) throw() override;
-	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
-		return m_pt->dbg_print(ctx);
+		return m_pt->dbg_print(ctx + 1);
 	}
 
 private:

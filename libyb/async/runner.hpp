@@ -24,6 +24,7 @@ public:
 	template <typename R>
 	R operator%(task<R> && t);
 
+	virtual std::string dbg_print_unsafe() = 0;
 protected:
 	virtual void submit(detail::prepared_task * pt) = 0;
 	virtual void run_until(detail::prepared_task * pt) = 0;

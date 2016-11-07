@@ -36,6 +36,7 @@ public:
 	virtual bool finish_wait(task_wait_finalization_context & fin_ctx) throw() = 0;
 	virtual void cancel_and_wait() throw() = 0;
 
+	virtual std::string dbg_print(detail::dbg_print_ctx ctx) = 0;
 protected:
 	virtual ~prepared_task();
 

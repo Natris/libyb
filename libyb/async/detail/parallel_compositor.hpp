@@ -26,11 +26,11 @@ public:
 
 	template <typename F>
 	void finish_wait(task_wait_finalization_context & ctx, F f) throw();
-	std::string dbg_print(const detail::dbg_print_ctx& ctx)
+	std::string dbg_print(detail::dbg_print_ctx ctx)
 	{
 		std::string str;
 		for (auto & item: m_tasks) {
-			str += item.t.dbg_print(ctx);
+			str += item.t.dbg_print(ctx + 1);
 		}
 		return str;
 	}
