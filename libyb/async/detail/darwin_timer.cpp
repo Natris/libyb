@@ -39,6 +39,10 @@ public:
 	{
 		return async::value();
 	}
+	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	{
+		return detail::dbg_print(ctx, "darwin_timer_task: milliseconds=%d, m_time=%llu", (int)m_ms, m_time);
+	}
 
 private:
 	int m_ms;

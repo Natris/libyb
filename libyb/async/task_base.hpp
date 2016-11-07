@@ -2,6 +2,7 @@
 #define LIBYB_ASYNC_TASK_BASE_HPP
 
 #include "cancel_level.hpp"
+#include "detail/dbg_print.hpp"
 
 namespace yb {
 
@@ -29,6 +30,9 @@ public:
 	// A task-based task indicates a continuation.
 	// A result task indicates a completion.
 	virtual task<R> finish_wait(task_wait_finalization_context & ctx) throw() = 0;
+
+
+	virtual std::string dbg_print(const detail::dbg_print_ctx & ctx) = 0;
 };
 
 template <typename R>

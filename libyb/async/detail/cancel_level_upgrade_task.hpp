@@ -38,6 +38,12 @@ public:
 			return nulltask;
 		return std::move(m_nested);
 	}
+	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	{
+		std::string str = detail::dbg_print(ctx, "cancel_level_upgrade_task (%d->%d)", (int)m_from, (int)m_to);
+		str += m_nested.dbg_print(ctx);
+		return str;
+	}
 
 private:
 	task<R> m_nested;
@@ -89,6 +95,12 @@ public:
 		{
 			return async::raise<void>();
 		}
+	}
+	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	{
+		std::string str = detail::dbg_print(ctx, "cancel_level_upgrade_task (%d->%d): catch cancel=%d", (int)m_from, (int)m_to, (int)m_catch_cancel);
+		str += m_nested.dbg_print(ctx);
+		return str;
 	}
 
 private:

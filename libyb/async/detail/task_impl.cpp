@@ -109,6 +109,10 @@ public:
 	{
 		return yb::async::value();
 	}
+	std::string dbg_print(const yb::detail::dbg_print_ctx& ctx) override
+	{
+		return yb::detail::dbg_print(ctx, "infinite_loop_task");
+	}
 };
 
 }

@@ -20,6 +20,12 @@ public:
 	task<R> cancel_and_wait() throw() override;
 	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override;
 	task<R> finish_wait(task_wait_finalization_context & ctx) throw() override;
+	std::string dbg_print(const detail::dbg_print_ctx& ctx) override
+	{
+		std::string str = detail::dbg_print(ctx, "sequential_composition_task");
+		str += m_task.dbg_print(ctx);
+		return str;
+	}
 
 private:
 	task<S> m_task;

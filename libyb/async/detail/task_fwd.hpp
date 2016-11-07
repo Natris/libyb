@@ -170,6 +170,7 @@ public:
 
 	task<void> ignore_result();
 
+	std::string dbg_print(const detail::dbg_print_ctx & ctx);
 private:
 	typedef task_base<R> * task_base_ptr;
 

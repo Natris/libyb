@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace yb {
-
+/*
 class timer
 {
 public:
@@ -20,7 +20,7 @@ private:
 
 	timer(timer const &);
 	timer & operator=(timer const &);
-};
+};*/
 
 task<void> wait_ms(int milliseconds);
 

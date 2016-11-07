@@ -144,6 +144,28 @@ task<R>::task(task<R> && o)
 
 	o.clear();
 }
+	
+template <typename R>	
+std::string task<R>::dbg_print(const detail::dbg_print_ctx & ctx)
+{
+	switch (m_kind)
+	{
+	case k_value:
+		return detail::dbg_print(ctx, "yb::task containing value");
+	case k_exception:
+		return detail::dbg_print(ctx, "yb::task containing exception");
+	case k_task:
+	case k_future:
+		{
+			std::string str = detail::dbg_print(ctx, "yb::task containing task:");
+			str += as_task()->dbg_print(ctx);
+			return str;
+		}
+	case k_empty:
+		return detail::dbg_print(ctx, "yb::task containing empty task");
+	}
+	
+}
 
 template <typename R>
 task<R>::~task()
