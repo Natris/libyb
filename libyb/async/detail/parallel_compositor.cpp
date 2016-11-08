@@ -39,7 +39,7 @@ task<void> parallel_compositor::pop()
 	assert(!this->empty());
 	task<void> res = std::move(m_tasks.front().t);
 	m_tasks.pop_front();
-	return std::move(res);
+	return res;
 }
 
 void parallel_compositor::prepare_wait(task_wait_preparation_context & ctx, cancel_level cl)

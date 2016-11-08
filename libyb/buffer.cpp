@@ -300,7 +300,7 @@ buffer buffer::share() const
 
 	buffer res(m_vtable, m_ptr, m_size);
 	m_vtable->share(res.m_ptr, res.m_size);
-	return std::move(res);
+	return res;
 }
 
 void yb::swap(buffer_view & lhs, buffer_view & rhs)
@@ -358,7 +358,7 @@ buffer_view buffer_view::clone() const
 	buffer_view res;
 	res.m_buffer = m_buffer.share();
 	res.m_view = m_view;
-	return std::move(res);
+	return res;
 }
 
 buffer_ref const & buffer_view::operator*() const
@@ -427,7 +427,7 @@ buffer_policy buffer_policy::ref()
 
 	buffer_policy res;
 	new(&res.m_storage) buffer_policy_ref(&vtable);
-	return std::move(res);
+	return res;
 }
 
 task<buffer> buffer_policy::fetch(size_t min_size, size_t max_size)

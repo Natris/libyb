@@ -194,7 +194,7 @@ public:
 	{
 	}
 
-	task<R> cancel_and_wait() throw()
+	task<R> cancel_and_wait() throw() override
 	{
 		try
 		{
@@ -214,13 +214,13 @@ public:
 		}
 	}
 
-	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl)
+	void prepare_wait(task_wait_preparation_context & ctx, cancel_level cl) override
 	{
 		m_cancel_level = cl;
 		m_state.prepare_wait(ctx, cl);
 	}
 
-	task<R> finish_wait(task_wait_finalization_context & ctx) throw()
+	task<R> finish_wait(task_wait_finalization_context & ctx) throw() override
 	{
 		try
 		{

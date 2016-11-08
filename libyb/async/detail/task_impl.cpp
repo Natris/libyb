@@ -43,7 +43,7 @@ yb::task<void> yb::detail::task_value_traits<void>::from_value()
 {
 	task<void> res;
 	res.m_kind = task<void>::k_value;
-	return std::move(res);
+	return res;
 }
 
 void yb::detail::task_value_traits<void>::get_value()

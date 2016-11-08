@@ -64,7 +64,7 @@ task<device_descriptor> read_device_descriptor(device & d)
 		std::shared_ptr<handler> h(new handler(d));
 		return d.write_packet(yb::make_packet(0) % 0).then([&d, h]() -> task<device_descriptor> {
 			std::shared_ptr<handler> h2(h);
-			return h->m_out.receive().then([h2](task<device_descriptor> t) { return std::move(t); });
+			return h->m_out.receive().then([h2](task<device_descriptor> t) { return t; });
 		});
 	}
 	catch (...)
