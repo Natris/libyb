@@ -10,6 +10,12 @@ namespace detail {
 
 typedef int dbg_print_ctx;
 
+
+inline std::string dbg_print(dbg_print_ctx , const char * , ...)
+{
+	return std::string();
+}
+#if 0
 template<typename ... Args>
 std::string dbg_print(dbg_print_ctx ctx, const char * fmt, Args ... args)
 {
@@ -27,6 +33,7 @@ std::string dbg_print(dbg_print_ctx ctx, const char * fmt, Args ... args)
 	printf("\n");
 	return std::string();
 }
+#endif // 0
 
 } // namespace detail
 } // namespace yb
