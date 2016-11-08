@@ -12,7 +12,7 @@ class prepared_task;
 struct prepared_task_event_sink
 {
 	virtual void cancel(prepared_task * promise) throw() = 0;
-	virtual void cancel_and_wait(prepared_task * promise) throw() = 0;
+	//virtual void cancel_and_wait(prepared_task * promise) throw() = 0;
 };
 
 class prepared_task
@@ -24,7 +24,7 @@ public:
 	void release() throw();
 
 	// Shadow task interface
-	void request_cancel(cancel_level cl, bool nolock) throw();
+	void request_cancel(cancel_level cl) throw();
 	void shadow_prepare_wait(task_wait_preparation_context & prep_ctx, cancel_level cl);
 	void shadow_wait() throw();
 	void shadow_cancel_and_wait() throw();

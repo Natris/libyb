@@ -19,7 +19,7 @@ public:
 	void prepare_wait(task_wait_preparation_context & prep_ctx) override;
 	bool finish_wait(task_wait_finalization_context & fin_ctx) throw() override;
 	void cancel_and_wait() throw() override;
-	std::string dbg_print(detail::dbg_print_ctx ctx)
+	std::string dbg_print(detail::dbg_print_ctx ctx) override
 	{
 		std::string str = detail::dbg_print(ctx + 1, "prepared_task_impl: applied_cl=%d", (int)m_applied_cl);
 		str += m_task.dbg_print(ctx + 1);
@@ -124,7 +124,7 @@ shadow_task<R>::~shadow_task()
 template <typename R>
 void shadow_task<R>::cancel(cancel_level cl) throw()
 {
-	m_pt->request_cancel(cl, false);
+	m_pt->request_cancel(cl);
 }
 
 template <typename R>

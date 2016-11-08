@@ -231,28 +231,3 @@ void sync_runner::cancel(detail::prepared_task *) throw()
 	detail::scoped_pthread_lock l(m_pimpl->m_mutex);
 	m_pimpl->m_update_event.set();
 }
-
-void sync_runner::cancel_and_wait(detail::prepared_task * pt) throw()
-{
-	assert(m_pimpl->m_associated_thread != (pthread_t)-1);
-
-	if (m_pimpl->m_associated_thread == pthread_self())
-	{
-		for (std::list<impl::task_entry>::iterator it = m_pimpl->m_tasks.begin(), eit = m_pimpl->m_tasks.end(); it != eit; ++it)
-		{
-			if (it->pt == pt)
-			{
-				m_pimpl->m_tasks.erase(it);
-				break;
-			}
-		}
-
-		pt->cancel_and_wait();
-		pt->detach_event_sink();
-	}
-	else
-	{
-		pt->request_cancel(cl_kill, true);
-		pt->shadow_wait();
-	}
-}
